@@ -52,10 +52,12 @@ class turing{
 
             numRules = scan.nextInt();
 
+            System.out.println("Format: ");
+            System.out.println("InputState charToRead endState charToWrite tapeMovement");
+
             for(int j = 0; j < numRules; j++){
 
-                System.out.println("Format: ");
-                System.out.println("InputState charToRead endState charToWrite tapeMovement");
+                
                 inputState = scan.nextInt();
 
                 charToRead = scan.next();
@@ -83,11 +85,15 @@ class turing{
                 test = scan.next();
                 testStrings.add(test); //Store the current test string
                 int pass = machineProcess(test, maxNumSimSteps, rules); //Get whether the test string passes, not, or fails to halt in 10 steps
-
+                System.out.println("Pass: " + pass);
                 testStringOutcomes.add(pass);
             }
 
             machineOutput(testStrings, testStringOutcomes, i);
+
+            //Empty the test strings so the new machines do not print out any old test strings
+            testStringOutcomes.clear();
+            testStrings.clear();
         }
 
         scan.close();
@@ -101,7 +107,7 @@ class turing{
         int currentState = 0;
 
         int aValue = 0, bValue = 1, blankValue = 2, poundValue = 3;
-        int i, j;
+        int i, j, numSteps = 0;
 
 
         //Copy the string into the tape character by character
@@ -141,6 +147,10 @@ class turing{
                 } else if(rules[currentState][aValue].tapeMovement == 1){ //Right movement
 
                     tapeHead++;
+                    if(tape[tapeHead] == ' '){
+
+                        tape[tapeHead] = 'B';
+                    }
 
                 }
 
@@ -173,6 +183,12 @@ class turing{
                 } else if(rules[currentState][bValue].tapeMovement == 1){ //Right movement
 
                     tapeHead++;
+                    if(tape[tapeHead] == ' '){
+
+                        //Need this so the machine recognizes that it's a blank space and can handle that
+                        tape[tapeHead] = 'B';
+
+                    }
 
                 }
 
@@ -205,6 +221,11 @@ class turing{
                 } else if(rules[currentState][blankValue].tapeMovement == 1){ //Right movement
 
                     tapeHead++;
+                    if(tape[tapeHead] == ' '){
+
+                        tape[tapeHead] = 'B';
+
+                    }
 
                 }
 
@@ -236,6 +257,10 @@ class turing{
                 } else if(rules[currentState][poundValue].tapeMovement == 1){ //Right movement
 
                     tapeHead++;
+                    if(tape[tapeHead] == ' '){
+
+                        tape[tapeHead] = 'B';
+                    }
 
                 }
 
@@ -244,10 +269,20 @@ class turing{
 
             } else {
 
-                System.out.println("Invalid character for string.  Rejecting.");
+                System.out.println("Invalid character for string.");
 
                 //Invalid string character
-                System.exit(0);
+                return 2;
+
+            }
+
+            //Keep track of the number of steps
+            numSteps++;
+
+            //If we go over the boundaries of the number of simulation steps, stop
+            if(numSteps >= maxNumSimSteps){
+
+                return 3; //Does not halt
 
             }
 
@@ -261,16 +296,8 @@ class turing{
 
                 return 2;
 
-            }
+            }            
         }
-
-        //If we go over the boundaries of the number of simulation steps, stop
-        if(j >= maxNumSimSteps){
-
-            return 3; //Does not halt
-
-        }
-
         return 0;
 
     }
@@ -290,9 +317,10 @@ class turing{
 
                 System.out.println(testStrings.get(i) + ": NO");
 
-            } else {
+            } else if(testStringOutcomes.get(i) == 3){
 
-                System.out.println(testStrings.get(i) + ": DOES NOT HALT IN 10 STEPS");
+                System.out.println(testStrings.get(i) + ": DOES NOT HALT IN " + maxNumSimSteps + " STEPS");
+
             }
         }
     }
